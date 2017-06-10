@@ -21,9 +21,8 @@ public abstract class AnalyzerUtil {
 	public static void getMethodInvocationTrace(MethodDeclaration method, CompilationUnit unit){
 
 		GeneralVisitor generalVisitor = new GeneralVisitor(unit);
-		System.out.println("START ----- " + method.getNameAsString());
+		System.out.println("==================" + method.getName() +  "====================");
 		method.accept(generalVisitor, null);
-		System.out.println(method.getNameAsString() + " ----- END ");
 	}
 	
 }
