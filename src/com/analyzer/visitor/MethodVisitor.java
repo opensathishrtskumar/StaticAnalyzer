@@ -22,7 +22,8 @@ public class MethodVisitor extends Visitor {
 	public void visit(MethodDeclaration method, Void arg) {
 
 		boolean add = true;
-
+		
+		//Dont consider native methods for processing
 		if((method.isPrivate() && !isPrivateRequired()) 
 				|| method.isNative()){
 			add = false;
