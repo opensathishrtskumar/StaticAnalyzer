@@ -7,7 +7,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
-public abstract class Visitor extends VoidVisitorAdapter<Void>{
+public abstract class Visitor<T> extends VoidVisitorAdapter<T>{
 	
 	protected List<MethodDeclaration> methodList = new ArrayList<MethodDeclaration>();
 	

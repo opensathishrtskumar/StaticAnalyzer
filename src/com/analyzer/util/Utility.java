@@ -5,6 +5,7 @@ import static com.analyzer.constants.LangConstants.JAVA_EXTN;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +18,10 @@ import com.analyzer.rules.Rules;
 import com.analyzer.workers.UnitCreator;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
 
 public final class Utility {
 	
@@ -32,7 +37,7 @@ public final class Utility {
 	public static CompilationUnit createCompilationUnit(File source) throws FileNotFoundException{
 		
 		CompilationUnit compilationUnit = JavaParser.parse(source);
-		
+        
 		addCompilationUnit2Map(source, compilationUnit);
 		
 		return compilationUnit;
@@ -62,12 +67,21 @@ public final class Utility {
 		builder.append(packageName);
 		if(!packageName.isEmpty())
 			builder.append(".");
-		builder.append(file.getName());
+		
+		NodeList<TypeDeclaration<?>> list = compilationUnit.getTypes();
+		
+		list.forEach(node -> {
+			if(node instanceof ClassOrInterfaceDeclaration){
+				ClassOrInterfaceDeclaration classDec = (ClassOrInterfaceDeclaration) node;
+                    if (!classDec.isInterface()) {
+                    	builder.append(classDec.getName());
+                    }
+			}
+		});
 		
 		Model model = new Model(compilationUnit, file);
 		
 		getCompilationUnitMap().put(builder.toString(), model);
-		
 	}
 	
 	public static List<File> listJavaFiles(String directoryName) {
@@ -130,10 +144,10 @@ public final class Utility {
 	 * Add Rules required to execute against input sources
 	 * 
 	 */
-	public static List<Rules> getRequiredRules(){
+	public static List<Rules> getRequiredRules(String[] sourcePath, String[] jarPath){
 		List<Rules> rules = new ArrayList<Rules>();
 		
-		rules.add(new NullArgumentRule());
+		rules.add(new NullArgumentRule(sourcePath, jarPath));
 		
 		return rules;
 	}

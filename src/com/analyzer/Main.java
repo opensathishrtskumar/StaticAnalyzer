@@ -17,14 +17,16 @@ public class Main {
 
 	public static void main(String[] args) throws FileNotFoundException {
 
-		String sourceFolder = "/home/sathishrtskumar/Downloads/EMS_Windows/src/";
+		String sourceFolder = "C:/Users/Gokul.m/workspace/Git/EMS/src";
 
 		Utility.loadSourceFiles(sourceFolder);
 
 		String[] files2Scan = {
-				"/home/sathishrtskumar/Downloads/EMS_Windows/src/com/ems/UI/internalframes/PingInternalFrame.java"/*,
-				"/home/sathishrtskumar/Downloads/EMS_Windows/src/com/ems/UI/internalframes/PollingIFrame.java",
-				"/home/sathishrtskumar/Downloads/EMS_Windows/src/com/ems/UI/swingworkers/ManageDeviceTask.java"*/	
+				"C:/Users/Gokul.m/workspace/Git/EMS/src/com/ems/UI/swingworkers/DBPollingWorker.java",
+				//"/home/sathishrtskumar/Downloads/EMS_Windows/src/com/ems/UI/internalframes/PollingIFrame.java",
+				//"/home/sathishrtskumar/Downloads/sEMS_Windows/src/com/ems/UI/swingworkers/ManageDeviceTask.java",
+				//sourceFolder + "/com/ems/util/ConfigHelper.java",
+				//sourceFolder + "/com/ems/UI/swingworkers/ManageDeviceTask.java"
 			};
 
 		
@@ -33,7 +35,7 @@ public class Main {
 		for(String scanMe : files2Scan){			
 			CompilationUnit unitToAnalyze = Utility.createCompilationUnit(scanMe);
 			AnalyzeWorker worker = new AnalyzeWorker(unitToAnalyze);			
-			worker.setRules(getRequiredRules());
+			worker.setRules(getRequiredRules(new String[]{sourceFolder},new String[]{}));
 			tasks.add(ConcurrencyUtils.execute(worker));
 		}										
 		

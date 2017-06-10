@@ -1,28 +1,64 @@
 package com.analyzer.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import com.analyzer.visitor.GeneralVisitor;
 import com.analyzer.visitor.MethodVisitor;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 public abstract class AnalyzerUtil {
-	
-	public static List<MethodDeclaration> getMethods(CompilationUnit unit,
-			boolean privateRequired){
-		MethodVisitor visitor = new MethodVisitor(unit);
-		visitor.setPrivateRequired(privateRequired);
-		visitor.visit(unit, null);
+
+	public static List<MethodDeclaration> getMethods(CompilationUnit unit,  String[] sourcePath,
+			String[] jarPath) {
+		MethodVisitor<JavaParserFacade> visitor = new MethodVisitor<JavaParserFacade>(unit);
+		JavaParserFacade facade = getTypeResolver(sourcePath, jarPath);
+		visitor.visit(unit, facade);
 		List<MethodDeclaration> methodList = visitor.getMethodList();
 		return methodList;
 	}
-	
-	public static void getMethodInvocationTrace(MethodDeclaration method, CompilationUnit unit){
+
+	public static void getMethodInvocationTrace(MethodDeclaration method, CompilationUnit unit, String[] sourcePath,
+			String[] jarPath) {
 
 		GeneralVisitor generalVisitor = new GeneralVisitor(unit);
-		System.out.println("==================" + method.getName() +  "====================");
-		method.accept(generalVisitor, null);
+		System.out.println("==================" + method.getName() + "====================");
+
+		JavaParserFacade facade = getTypeResolver(sourcePath, jarPath);
+
+		method.accept(generalVisitor, facade);
 	}
-	
+
+	public static JavaParserFacade getTypeResolver(String[] sourcePath, String[] jarPath) {
+
+		CombinedTypeSolver typeSolver = new CombinedTypeSolver(new ReflectionTypeSolver());
+
+		if (sourcePath != null) {
+			for (String source : sourcePath) {
+				typeSolver.add(new JavaParserTypeSolver(new File(source)));
+			}
+		}
+
+		if (jarPath != null) {
+			for (String source : jarPath) {
+				try {
+					typeSolver.add(new JarTypeSolver(source));
+				} catch (IOException e) {
+					System.err.println(" Jar Type solver failed :  " + source);
+				}
+			}
+		}
+
+		JavaParserFacade facade = JavaParserFacade.get(typeSolver);
+
+		return facade;
+	}
+
 }

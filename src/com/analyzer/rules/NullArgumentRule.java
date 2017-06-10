@@ -11,23 +11,26 @@ public class NullArgumentRule implements Rules {
 	
 	private List<MethodDeclaration> allMethod = null;
 	
+	private String[] sourcePath = null, jarPath = null;
+	
+	public NullArgumentRule() {
+	}
+	
+	public NullArgumentRule(String[] sourcePath, String[] jarPath) {
+		this.sourcePath = sourcePath;
+		this.jarPath = jarPath;
+	}
+	
 	@Override
 	public void preProcessing(CompilationUnit unit) throws Exception {
-		
-		this.allMethod = AnalyzerUtil.getMethods(unit, true);
-		
-		allMethod.forEach(method -> {
-			
-			AnalyzerUtil.getMethodInvocationTrace(method, unit);
-			//System.out.println(Thread.currentThread().getName() + " : " + method.getNameAsString());
-		});
-		
+		this.allMethod = AnalyzerUtil.getMethods(unit, getSourcePath(), getJarPath());
 	}
 
 	@Override
 	public Result apply(CompilationUnit unit) throws Exception {
-		//System.out.println("Excecute Logic for null argument " + Thread.currentThread().getName());
-		
+		this.allMethod.forEach(method -> {
+			AnalyzerUtil.getMethodInvocationTrace(method, unit, getSourcePath(), getJarPath());
+		});
 		
 		return null;
 	}
@@ -42,4 +45,23 @@ public class NullArgumentRule implements Rules {
 		return result;
 	}
 
+
+	public String[] getSourcePath() {
+		return sourcePath;
+	}
+
+
+	public void setSourcePath(String[] sourcePath) {
+		this.sourcePath = sourcePath;
+	}
+
+
+	public String[] getJarPath() {
+		return jarPath;
+	}
+
+
+	public void setJarPath(String[] jarPath) {
+		this.jarPath = jarPath;
+	}
 }

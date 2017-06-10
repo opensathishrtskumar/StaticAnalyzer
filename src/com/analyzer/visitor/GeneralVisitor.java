@@ -1,96 +1,63 @@
 package com.analyzer.visitor;
 
-import java.io.File;
 import java.util.Optional;
 
+import com.analyzer.constants.Model;
+import com.analyzer.util.Utility;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
-import com.github.javaparser.symbolsolver.model.typesystem.Type;
-import com.github.javaparser.symbolsolver.model.typesystem.VoidType;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.github.javaparser.symbolsolver.model.declarations.MethodDeclaration;
+import com.github.javaparser.symbolsolver.model.declarations.ValueDeclaration;
+import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
 
-public class GeneralVisitor  extends Visitor {
+public class GeneralVisitor  extends Visitor<JavaParserFacade> {
 
 	public GeneralVisitor(CompilationUnit unit) {
 		super(unit);
 	}
 	
-	
-	private Type getFacade(String sourceFolder, Node node){
-		Type type = null;
-		
-		try {
-			CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver(
-					new ReflectionTypeSolver(),
-					new JavaParserTypeSolver(new File(sourceFolder)),
-					new JarTypeSolver("E:\\lib\\")
-					);
-			
-			JavaParserFacade facade = JavaParserFacade.get(combinedTypeSolver);
-			
-			type = facade.getType(node);
-			
-		} catch (Exception e) {
-			System.err.println(e.getLocalizedMessage());
-		}
-		
-		return type;
-	}
-	
-	
 	@Override
-	public void visit(ObjectCreationExpr n, Void arg) {
+	public void visit(ObjectCreationExpr n, JavaParserFacade arg) {
 		
 		Optional<Expression> expression = n.getScope();
 		
 		expression.ifPresent(instance -> {
 			instance.getParentNode();
-			
-			
-			//unit.getClassByName();
-			
 		});
 		
 		
 		super.visit(n, arg);
 	}
 	
+	
 	@Override
-	public void visit(MethodCallExpr n, Void arg) {
+	public void visit(MethodCallExpr n, JavaParserFacade javaParserFacade) {
+		super.visit(n, javaParserFacade);
 		
-		//n.getScope().ifPresent(scope -> System.out.println(scope.getParentNode()));
-		String sourceFolder = "C:/Users/Gokul.m/workspace/Git/EMS/src/";
-		
-		Optional<Expression> scope = n.getScope();
-		
-		if(scope.isPresent()){
+		try {
 			
-			Expression expression = scope.get();
-			
-			//System.out.println("Scope : " + scope.get() + " " + n.getName());
-			
-			getFacade(sourceFolder, expression.getParentNode().get());
-			
-		} else {
-			System.out.println("No Scope : " + n.toString());
-			
-			Type type = getFacade(sourceFolder, n.getParentNodeForChildren());
-			
-			if(type instanceof VoidType){
-				VoidType vType = (VoidType)type;
-				System.out.println(vType.describe());
+			if(n.getScope().isPresent()){
+				System.out.println("Presennt " + n.getScope().get());
+				System.out.println(n.toString() + " has type " + javaParserFacade.getType(n.getScope().get()).describe());
+				
+				SymbolReference<? extends ValueDeclaration> referennce = javaParserFacade.solve(n.getScope().get());
+				
+				SymbolReference<MethodDeclaration> declaration = javaParserFacade.solve(n);
+				
+				System.out.println(declaration);
+				if(referennce.isSolved()){
+					System.out.println("Solved : " + referennce.getCorrespondingDeclaration());
+				}
+				
 			}
-			
-			System.out.println("No Scope Type : " + type);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
 		}
 		
-		super.visit(n, arg);
+		System.out.println("=========================================");
 	}
 }

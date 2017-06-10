@@ -3,33 +3,16 @@ package com.analyzer.visitor;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 
-public class MethodVisitor extends Visitor {
-	private boolean privateRequired = true;
-
-	public boolean isPrivateRequired() {
-		return privateRequired;
-	}
-
-	public void setPrivateRequired(boolean privateRequired) {
-		this.privateRequired = privateRequired;
-	}
+public class MethodVisitor<T> extends Visitor<T> {
 
 	public MethodVisitor(CompilationUnit unit) {
 		super(unit);
 	}
 	
 	@Override
-	public void visit(MethodDeclaration method, Void arg) {
+	public void visit(MethodDeclaration method, T arg) {
 
-		boolean add = true;
-		
-		//Dont consider native methods for processing
-		if((method.isPrivate() && !isPrivateRequired()) 
-				|| method.isNative()){
-			add = false;
-		}
-
-		if(add)
+		if(!method.isNative())
 			getMethodList().add(method);
 
 		super.visit(method, arg);
