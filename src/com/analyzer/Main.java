@@ -1,41 +1,54 @@
 package com.analyzer;
 
+import static com.analyzer.util.Utility.getRequiredRules;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import com.analyzer.constants.Model;
 import com.analyzer.util.ConcurrencyUtils;
 import com.analyzer.util.Utility;
 import com.analyzer.workers.AnalyzeWorker;
 import com.github.javaparser.ast.CompilationUnit;
 
-import static com.analyzer.util.Utility.*;
-
 public class Main {
 
+	/**
+	 * @param args
+	 * @throws FileNotFoundException
+	 */
 	public static void main(String[] args) throws FileNotFoundException {
 
 		String sourceFolder = "C:/Users/Gokul.m/workspace/Git/EMS/src";
 
-		Utility.loadSourceFiles(sourceFolder);
+		Map<String, Object> sourceUnits = Utility.loadSourceFiles(sourceFolder);
 
 		String[] files2Scan = {
-				"C:/Users/Gokul.m/workspace/Git/EMS/src/com/ems/UI/swingworkers/DBPollingWorker.java",
-				//"/home/sathishrtskumar/Downloads/EMS_Windows/src/com/ems/UI/internalframes/PollingIFrame.java",
-				//"/home/sathishrtskumar/Downloads/sEMS_Windows/src/com/ems/UI/swingworkers/ManageDeviceTask.java",
-				//sourceFolder + "/com/ems/util/ConfigHelper.java",
-				//sourceFolder + "/com/ems/UI/swingworkers/ManageDeviceTask.java"
+				//"com.ems.UI.swingworkers.DBPollingWorker",
+				//"com.ems.tmp.datamngr.TempDataManager",
+				//"com.ems.UI.Main",
+				//"com.ems.util.AnalyzeTest",
+				//"com.ems.UI.internalframes.DashboardFrame",
+				"com.ems.response.handlers.DashboardResponseHandler",
 			};
 
 		
 		List<Future<?>> tasks = new ArrayList<>();
 		
 		for(String scanMe : files2Scan){			
-			CompilationUnit unitToAnalyze = Utility.createCompilationUnit(scanMe);
+			Model model = (Model)sourceUnits.get(scanMe);
+			CompilationUnit unitToAnalyze = model.getUnit();
+			
+			if(unitToAnalyze == null){
+				continue;
+			}
+			
 			AnalyzeWorker worker = new AnalyzeWorker(unitToAnalyze);			
-			worker.setRules(getRequiredRules(new String[]{sourceFolder},new String[]{}));
+			worker.setRules(getRequiredRules(new String[]{sourceFolder},new String[]{/*pass here jar(s)*/}));
 			tasks.add(ConcurrencyUtils.execute(worker));
 		}										
 		

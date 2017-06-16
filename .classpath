@@ -3,11 +3,11 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Security"/>
-	<classpathentry kind="lib" path="lib/javaparser-core-3.2.4.jar"/>
+	<classpathentry kind="lib" path="lib/javaparser-core-3.2.4.jar" sourcepath="C:/Users/Gokul.m/AppData/Local/Temp/decompiler/source/javaparser-core-3.2.4-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java-symbol-solver-logic-0.5.5.jar"/>
 	<classpathentry kind="lib" path="lib/javassist-3.12.1.GA.jar"/>
 	<classpathentry kind="lib" path="lib/guava-r05.jar"/>
-	<classpathentry kind="lib" path="lib/java-symbol-solver-core-0.5.5.jar"/>
-	<classpathentry kind="lib" path="lib/java-symbol-solver-model-0.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/java-symbol-solver-core-0.5.5.jar" sourcepath="C:/Users/Gokul.m/AppData/Local/Temp/decompiler/source/java-symbol-solver-core-0.5.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java-symbol-solver-model-0.5.5.jar" sourcepath="C:/Users/Gokul.m/AppData/Local/Temp/decompiler/source/java-symbol-solver-model-0.5.5-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -10,7 +10,6 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 public class NullArgumentRule implements Rules {
 	
 	private List<MethodDeclaration> allMethod = null;
-	
 	private String[] sourcePath = null, jarPath = null;
 	
 	public NullArgumentRule() {
@@ -28,9 +27,14 @@ public class NullArgumentRule implements Rules {
 
 	@Override
 	public Result apply(CompilationUnit unit) throws Exception {
-		this.allMethod.forEach(method -> {
-			AnalyzerUtil.getMethodInvocationTrace(method, unit, getSourcePath(), getJarPath());
-		});
+		
+		if(this.allMethod != null){
+			this.allMethod.forEach(method -> {
+				System.out.println("============Starts " + method.getNameAsString() + "=====================");
+				AnalyzerUtil.getMethodInvocationTrace(method, unit, getSourcePath(), getJarPath());
+				System.out.println("============Ends " + method.getNameAsString() + "=====================");
+			});
+		}
 		
 		return null;
 	}
@@ -63,5 +67,13 @@ public class NullArgumentRule implements Rules {
 
 	public void setJarPath(String[] jarPath) {
 		this.jarPath = jarPath;
+	}
+
+	public List<MethodDeclaration> getAllMethod() {
+		return allMethod;
+	}
+
+	public void setAllMethod(List<MethodDeclaration> allMethod) {
+		this.allMethod = allMethod;
 	}
 }

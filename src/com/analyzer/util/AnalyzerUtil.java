@@ -9,6 +9,7 @@ import com.analyzer.visitor.MethodVisitor;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
@@ -19,7 +20,7 @@ public abstract class AnalyzerUtil {
 	public static List<MethodDeclaration> getMethods(CompilationUnit unit,  String[] sourcePath,
 			String[] jarPath) {
 		MethodVisitor<JavaParserFacade> visitor = new MethodVisitor<JavaParserFacade>(unit);
-		JavaParserFacade facade = getTypeResolver(sourcePath, jarPath);
+		JavaParserFacade facade = getJavaParserFacade(sourcePath, jarPath);
 		visitor.visit(unit, facade);
 		List<MethodDeclaration> methodList = visitor.getMethodList();
 		return methodList;
@@ -29,14 +30,24 @@ public abstract class AnalyzerUtil {
 			String[] jarPath) {
 
 		GeneralVisitor generalVisitor = new GeneralVisitor(unit);
-		System.out.println("==================" + method.getName() + "====================");
+		
+		//System.out.println("==================" + method.getName() + "====================");
 
-		JavaParserFacade facade = getTypeResolver(sourcePath, jarPath);
+		JavaParserFacade facade = getJavaParserFacade(sourcePath, jarPath);
+
+		method.accept(generalVisitor, facade);
+	}
+	
+	public static void getMethodInvocationTrace(MethodDeclaration method, CompilationUnit unit, JavaParserFacade facade) {
+
+		GeneralVisitor generalVisitor = new GeneralVisitor(unit);
+		
+		//System.out.println("==================" + method.getName() + "====================");
 
 		method.accept(generalVisitor, facade);
 	}
 
-	public static JavaParserFacade getTypeResolver(String[] sourcePath, String[] jarPath) {
+	public static TypeSolver getTypeResolver(String[] sourcePath, String[] jarPath) {
 
 		CombinedTypeSolver typeSolver = new CombinedTypeSolver(new ReflectionTypeSolver());
 
@@ -56,9 +67,25 @@ public abstract class AnalyzerUtil {
 			}
 		}
 
-		JavaParserFacade facade = JavaParserFacade.get(typeSolver);
-
-		return facade;
+		return typeSolver;
 	}
 
+	public static JavaParserFacade getJavaParserFacade(String[] sourcePath, String[] jarPath){
+		TypeSolver typeSolver = getTypeResolver(sourcePath, jarPath);		
+		JavaParserFacade facade = JavaParserFacade.get(typeSolver);
+		return facade;
+	}
+	
+	public static String getNameWithPackage(com.github.javaparser.symbolsolver.model.declarations.MethodDeclaration md){
+		StringBuilder builder = new StringBuilder();
+		
+		if(md != null){
+			builder.append(md.getPackageName());
+			if(!builder.toString().isEmpty())
+				builder.append(".");
+			builder.append(md.getClassName());
+		}
+		
+		return builder.toString();
+	}
 }
