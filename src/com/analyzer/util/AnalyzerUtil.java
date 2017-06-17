@@ -94,4 +94,23 @@ public abstract class AnalyzerUtil {
 
 		return builder.toString();
 	}
+
+	public static void printMethodTrace(List<Model> calls) {
+
+		for (Model model : calls) {
+			
+			printTab(model.getDepth());
+			
+			System.out.println(
+					model.getMethod().getDeclarationAsString() + "[" + Utility.getQualifiedName(model.getUnit()) + "]");
+
+			printMethodTrace(model.getInvocationList());
+		}
+	}
+
+	public static void printTab(int count) {
+		for (int i = 0; i < count; i++) {
+			System.out.print("\t");
+		}
+	}
 }

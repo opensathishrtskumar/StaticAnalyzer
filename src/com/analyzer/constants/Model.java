@@ -14,6 +14,7 @@ public class Model {
 	private File file;
 	private MethodDeclaration method;
 	private List<Model> invocationList;
+	private int depth;
 	
 	public Model() {
 		
@@ -51,6 +52,14 @@ public class Model {
 
 	public void setInvocationList(List<Model> invocationList) {
 		this.invocationList = invocationList;
+	}
+	
+	public int getDepth() {
+		return depth;
+	}
+
+	public void setDepth(int depth) {
+		this.depth = depth;
 	}
 
 	@Override

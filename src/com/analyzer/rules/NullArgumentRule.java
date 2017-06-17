@@ -1,6 +1,5 @@
 package com.analyzer.rules;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.analyzer.constants.Model;
@@ -33,22 +32,21 @@ public class NullArgumentRule implements Rules {
 	public Result apply(CompilationUnit unit) throws Exception {
 		
 		if(this.allMethod != null){
+			
+			
+			
 			for(int i = 0;i < this.allMethod.size();i++){
 				MethodDeclaration method = this.allMethod.get(i);
 				JavaParserFacade facade = AnalyzerUtil.getJavaParserFacade(getSourcePath(), getJarPath());
 				
 				MethodTraceHolder traceHolder = new MethodTraceHolder().setJavaParserFacade(facade)
-						.setMethodDeclaration(method).setCompilationUnit(unit);
+						.setMethodDeclaration(method).setCompilationUnit(unit).setDepth(0);
 				
 				System.out.println("============Starts " + method.getNameAsString() + "=====================");
 				List<Model> list = AnalyzerUtil.getMethodInvocationTrace(traceHolder);
 				
-				for(Model model : list){
-					System.out.println(model.getMethod().getNameAsString() + model.getInvocationList());
-				}
-				
-				System.out.println(list);
-				
+				AnalyzerUtil.printMethodTrace(list);
+								
 				System.out.println("============Ends " + method.getNameAsString() + "=====================");
 			}
 		}

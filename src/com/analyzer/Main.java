@@ -31,10 +31,10 @@ public class Main {
 				//"com.ems.UI.swingworkers.DBPollingWorker",
 				//"com.ems.tmp.datamngr.TempDataManager",
 				//"com.ems.UI.Main",
-				"com.ems.util.AnalyzeTest",
+				//"com.ems.util.AnalyzeTest",
 				//"com.ems.UI.internalframes.DashboardFrame",
 				//"com.ems.response.handlers.DashboardResponseHandler",
-				//"com.ems.UI.internalframes.ReportsIFrame",
+				"com.ems.UI.internalframes.ReportsIFrame",
 			};
 
 		
