@@ -3,6 +3,7 @@ package com.analyzer.util;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import com.analyzer.constants.Model;
 import com.analyzer.dto.MethodTraceHolder;
@@ -12,6 +13,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
@@ -98,14 +100,62 @@ public abstract class AnalyzerUtil {
 	public static void printMethodTrace(List<Model> calls) {
 
 		for (Model model : calls) {
-			
+
 			printTab(model.getDepth());
-			
+
 			System.out.println(
 					model.getMethod().getDeclarationAsString() + "[" + Utility.getQualifiedName(model.getUnit()) + "]");
 
 			printMethodTrace(model.getInvocationList());
 		}
+	}
+
+	public static void leafNodeFirst(List<Model> calls) {
+
+		for (Model model : calls) {
+			leafNodeFirst(model.getInvocationList());
+		}
+
+		processLeafNode(calls);
+	}
+
+	public static void processLeafNode(List<Model> calls) {
+
+		if (calls != null) {
+			for (Model model : calls) {
+				analyzeNullParamMethod(model);
+			}
+		}
+	}
+
+	public static void analyzeNullParamMethod(Model model) {
+		MethodDeclaration method = model.getMethod();
+		NodeList<ReferenceType> throwsList = method.getThrownExceptions();
+		NodeList<Parameter> parameters = method.getParameters();
+
+		if (isHavingThrowsDeclaration(throwsList)) {
+			System.out.println("NullHandling available " + method.getNameAsString());
+		}
+
+	}
+
+	/**
+	 * @param List of Exceptions thrown from method
+	 * @returns true when throws related to NullPointer Handling available
+	 */
+	public static boolean isHavingThrowsDeclaration(NodeList<ReferenceType> throwsList) {
+
+		boolean available = false;
+
+		for (int i = 0; i < throwsList.size(); i++) {
+			ReferenceType refType = throwsList.get(i);
+
+			if (refType.toString().matches("NullPointerException|Exception|Throwable")) {
+				available = true;
+			}
+		}
+
+		return available;
 	}
 
 	public static void printTab(int count) {
