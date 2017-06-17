@@ -1,7 +1,9 @@
 package com.analyzer.constants;
 
 import java.io.File;
+import java.util.List;
 
+import com.analyzer.util.Utility;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 
@@ -10,6 +12,7 @@ public class Model {
 	private CompilationUnit unit;
 	private File file;
 	private MethodDeclaration method;
+	private List<Model> invocationList;
 	
 	public Model() {
 		
@@ -40,4 +43,18 @@ public class Model {
 	public void setMethod(MethodDeclaration method) {
 		this.method = method;
 	}
+
+	public List<Model> getInvocationList() {
+		return invocationList;
+	}
+
+	public void setInvocationList(List<Model> invocationList) {
+		this.invocationList = invocationList;
+	}
+
+	@Override
+	public String toString() {
+		return  Utility.getQualifiedName(unit) + " -> " + method.getDeclarationAsString();
+	}
+	
 }

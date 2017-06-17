@@ -60,6 +60,26 @@ public final class Utility {
 		return builder.toString();
 	}
 
+	public static String getQualifiedName(CompilationUnit compilationUnit){
+		String packageName = getPackageName(compilationUnit);
+
+		StringBuilder builder = new StringBuilder();
+		builder.append(packageName);
+		if(!packageName.isEmpty())
+			builder.append(".");
+
+		NodeList<TypeDeclaration<?>> list = compilationUnit.getTypes();
+
+		list.forEach(node -> {
+			if(node instanceof ClassOrInterfaceDeclaration){
+				ClassOrInterfaceDeclaration classDec = (ClassOrInterfaceDeclaration) node;
+				builder.append(classDec.getName());
+			}
+		});
+
+		return builder.toString();
+	}
+	
 	private static void addCompilationUnit2Map(File file, CompilationUnit compilationUnit){
 		String packageName = getPackageName(compilationUnit);
 

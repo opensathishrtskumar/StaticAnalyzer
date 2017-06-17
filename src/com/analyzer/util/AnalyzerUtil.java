@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.analyzer.constants.Model;
+import com.analyzer.dto.MethodTraceHolder;
 import com.analyzer.visitor.GeneralVisitor;
 import com.analyzer.visitor.MethodVisitor;
 import com.github.javaparser.ast.CompilationUnit;
@@ -28,23 +29,12 @@ public abstract class AnalyzerUtil {
 		return methodList;
 	}
 
-	public static void getMethodInvocationTrace(MethodDeclaration method, CompilationUnit unit, String[] sourcePath,
-			String[] jarPath) {
+	public static List<Model> getMethodInvocationTrace(MethodTraceHolder traceHolder) {
 
-		GeneralVisitor generalVisitor = new GeneralVisitor(unit);
+		GeneralVisitor generalVisitor = new GeneralVisitor(traceHolder);
 
-		JavaParserFacade facade = getJavaParserFacade(sourcePath, jarPath);
+		traceHolder.getMethodDeclaration().accept(generalVisitor, traceHolder.getJavaParserFacade());
 
-		method.accept(generalVisitor, facade);
-	}
-
-	public static List<Model> getMethodInvocationTrace(MethodDeclaration method, CompilationUnit unit,
-			JavaParserFacade facade) {
-
-		GeneralVisitor generalVisitor = new GeneralVisitor(unit);
-
-		method.accept(generalVisitor, facade);
-		
 		return generalVisitor.getMethodCallList();
 	}
 
@@ -91,13 +81,12 @@ public abstract class AnalyzerUtil {
 		return builder.toString();
 	}
 
-	public static String getParameters(NodeList<Parameter> params){
+	public static String getParameters(NodeList<Parameter> params) {
 		StringBuilder builder = new StringBuilder();
 
-		if(params != null)
-		{
-			for(int count = 0;count < params.size();count++){
-				if(count > 0 && count <= params.size() - 1)
+		if (params != null) {
+			for (int count = 0; count < params.size(); count++) {
+				if (count > 0 && count <= params.size() - 1)
 					builder.append(",");
 				builder.append(params.get(count).getType());
 			}
