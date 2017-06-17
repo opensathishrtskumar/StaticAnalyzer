@@ -38,10 +38,14 @@ public class NullArgumentRule implements Rules {
 				JavaParserFacade facade = AnalyzerUtil.getJavaParserFacade(getSourcePath(), getJarPath());
 				
 				MethodTraceHolder traceHolder = new MethodTraceHolder().setJavaParserFacade(facade)
-						.setMethodDeclaration(method).setCompilationUnit(unit).setMethodCallList(new ArrayList<Model>());
+						.setMethodDeclaration(method).setCompilationUnit(unit);
 				
 				System.out.println("============Starts " + method.getNameAsString() + "=====================");
 				List<Model> list = AnalyzerUtil.getMethodInvocationTrace(traceHolder);
+				
+				for(Model model : list){
+					System.out.println(model.getMethod().getNameAsString() + model.getInvocationList());
+				}
 				
 				System.out.println(list);
 				

@@ -1,5 +1,6 @@
 package com.analyzer.visitor;
 
+import java.util.List;
 import java.util.Map;
 
 import com.analyzer.constants.Model;
@@ -25,7 +26,6 @@ public class GeneralVisitor extends Visitor<JavaParserFacade> {
 		super(traceHolder.getCompilationUnit());
 		this.traceHolder = traceHolder;
 		this.rootMethodCall = traceHolder.getMethodDeclaration();
-		this.methodCallList = traceHolder.getMethodCallList();
 	}
 
 	@Override
@@ -72,10 +72,11 @@ public class GeneralVisitor extends Visitor<JavaParserFacade> {
 
 				MethodTraceHolder traceHolder = new MethodTraceHolder().setJavaParserFacade(javaParserFacade)
 						.setMethodCallExpr(call).setReferenceMethodDeclaration(declaration)
-						.setCompilationUnit(model.getUnit()).setMethodDeclaration(method)
-						.setMethodCallList(getMethodCallList());//Set same list to get result
+						.setCompilationUnit(model.getUnit()).setMethodDeclaration(method);
 
-				AnalyzerUtil.getMethodInvocationTrace(traceHolder);
+				List<Model> subList = AnalyzerUtil.getMethodInvocationTrace(traceHolder);
+				
+				invocation.setInvocationList(subList);
 			} else if (declaration.getCorrespondingDeclaration() instanceof ReflectionMethodDeclaration) {
 
 				/*

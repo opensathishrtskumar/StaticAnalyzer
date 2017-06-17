@@ -1,6 +1,7 @@
 package com.analyzer.constants;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import com.analyzer.util.Utility;
@@ -54,7 +55,7 @@ public class Model {
 
 	@Override
 	public String toString() {
-		return  Utility.getQualifiedName(unit) + " -> " + method.getDeclarationAsString();
+		return  Utility.getQualifiedName(unit) + " -> " + method.getDeclarationAsString() + Arrays.toString(invocationList.toArray());
 	}
 	
 }
