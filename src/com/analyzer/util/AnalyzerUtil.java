@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import com.analyzer.constants.Model;
 import com.analyzer.visitor.GeneralVisitor;
 import com.analyzer.visitor.MethodVisitor;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
@@ -17,8 +20,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 
 public abstract class AnalyzerUtil {
 
-	public static List<MethodDeclaration> getMethods(CompilationUnit unit,  String[] sourcePath,
-			String[] jarPath) {
+	public static List<MethodDeclaration> getMethods(CompilationUnit unit, String[] sourcePath, String[] jarPath) {
 		MethodVisitor<JavaParserFacade> visitor = new MethodVisitor<JavaParserFacade>(unit);
 		JavaParserFacade facade = getJavaParserFacade(sourcePath, jarPath);
 		visitor.visit(unit, facade);
@@ -30,21 +32,20 @@ public abstract class AnalyzerUtil {
 			String[] jarPath) {
 
 		GeneralVisitor generalVisitor = new GeneralVisitor(unit);
-		
-		//System.out.println("==================" + method.getName() + "====================");
 
 		JavaParserFacade facade = getJavaParserFacade(sourcePath, jarPath);
 
 		method.accept(generalVisitor, facade);
 	}
-	
-	public static void getMethodInvocationTrace(MethodDeclaration method, CompilationUnit unit, JavaParserFacade facade) {
+
+	public static List<Model> getMethodInvocationTrace(MethodDeclaration method, CompilationUnit unit,
+			JavaParserFacade facade) {
 
 		GeneralVisitor generalVisitor = new GeneralVisitor(unit);
-		
-		//System.out.println("==================" + method.getName() + "====================");
 
 		method.accept(generalVisitor, facade);
+		
+		return generalVisitor.getMethodCallList();
 	}
 
 	public static TypeSolver getTypeResolver(String[] sourcePath, String[] jarPath) {
@@ -70,22 +71,38 @@ public abstract class AnalyzerUtil {
 		return typeSolver;
 	}
 
-	public static JavaParserFacade getJavaParserFacade(String[] sourcePath, String[] jarPath){
-		TypeSolver typeSolver = getTypeResolver(sourcePath, jarPath);		
+	public static JavaParserFacade getJavaParserFacade(String[] sourcePath, String[] jarPath) {
+		TypeSolver typeSolver = getTypeResolver(sourcePath, jarPath);
 		JavaParserFacade facade = JavaParserFacade.get(typeSolver);
 		return facade;
 	}
-	
-	public static String getNameWithPackage(com.github.javaparser.symbolsolver.model.declarations.MethodDeclaration md){
+
+	public static String getNameWithPackage(
+			com.github.javaparser.symbolsolver.model.declarations.MethodDeclaration md) {
 		StringBuilder builder = new StringBuilder();
-		
-		if(md != null){
+
+		if (md != null) {
 			builder.append(md.getPackageName());
-			if(!builder.toString().isEmpty())
+			if (!builder.toString().isEmpty())
 				builder.append(".");
 			builder.append(md.getClassName());
 		}
-		
+
+		return builder.toString();
+	}
+
+	public static String getParameters(NodeList<Parameter> params){
+		StringBuilder builder = new StringBuilder();
+
+		if(params != null)
+		{
+			for(int count = 0;count < params.size();count++){
+				if(count > 0 && count <= params.size() - 1)
+					builder.append(",");
+				builder.append(params.get(count).getType());
+			}
+		}
+
 		return builder.toString();
 	}
 }

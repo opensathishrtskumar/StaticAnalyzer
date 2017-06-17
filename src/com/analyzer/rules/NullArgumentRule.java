@@ -6,6 +6,7 @@ import com.analyzer.results.Result;
 import com.analyzer.util.AnalyzerUtil;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 
 public class NullArgumentRule implements Rules {
 	
@@ -29,11 +30,13 @@ public class NullArgumentRule implements Rules {
 	public Result apply(CompilationUnit unit) throws Exception {
 		
 		if(this.allMethod != null){
-			this.allMethod.forEach(method -> {
+			for(int i = 0;i < this.allMethod.size();i++){
+				MethodDeclaration method = this.allMethod.get(i);
+				JavaParserFacade facade = AnalyzerUtil.getJavaParserFacade(getSourcePath(), getJarPath());
 				System.out.println("============Starts " + method.getNameAsString() + "=====================");
-				AnalyzerUtil.getMethodInvocationTrace(method, unit, getSourcePath(), getJarPath());
+				AnalyzerUtil.getMethodInvocationTrace(method, unit, facade);
 				System.out.println("============Ends " + method.getNameAsString() + "=====================");
-			});
+			}
 		}
 		
 		return null;

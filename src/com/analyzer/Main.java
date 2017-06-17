@@ -32,8 +32,9 @@ public class Main {
 				//"com.ems.tmp.datamngr.TempDataManager",
 				//"com.ems.UI.Main",
 				//"com.ems.util.AnalyzeTest",
-				//"com.ems.UI.internalframes.DashboardFrame",
-				"com.ems.response.handlers.DashboardResponseHandler",
+				"com.ems.UI.internalframes.DashboardFrame",
+				//"com.ems.response.handlers.DashboardResponseHandler",
+				//"com.ems.UI.internalframes.ReportsIFrame",
 			};
 
 		
